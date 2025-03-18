@@ -140,7 +140,7 @@ func symbolic_refs_to(repository *git.Repository, ref *plumbing.Reference, prefi
 	iter.ForEach ( func(ref *plumbing.Reference) error {
 		content := dump_symbolic_ref(ref)
 		// reduced, _ := strings.CutPrefix(content, "ref: ")
-		if s == content {
+		if s == content.String() {
 			refs = append(refs, ref)
 		}
 		return nil})
@@ -188,15 +188,10 @@ func isSegment(name string, repository *git.Repository) (bool, *plumbing.Referen
 	return (err == nil), base
 }
 
-//  *plumbing.ReferenceName
-func dump_symbolic_ref(ref *plumbing.Reference) string {
-	// func NewSymbolicReference(n, target ReferenceName) *Reference
-	content := ref.Strings()
-	fmt.Println("symbolic ref", content[0], "points at", content[1])
-	return content[1]
-	// return plumbing.NewSymbolicReference("ref:/heads/x", "")
-	// *Reference
-	// "ref:"
+func dump_symbolic_ref(ref *plumbing.Reference) plumbing.ReferenceName {
+	content := ref.Target() // Strings()
+	// fmt.Println("symbolic ref", content[0], "points at", content[1])
+	return content
 }
 
 func set_symbolic_reference(repository *git.Repository,
