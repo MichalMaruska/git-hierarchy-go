@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"github.com/michalmaruska/git-hierarchy/git_hierarchy"
 	"github.com/michalmaruska/git-hierarchy/graph"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/pborman/getopt/v2"
 )
 
 func dump(vertices *[]graph.NodeExpander, order []int) {
