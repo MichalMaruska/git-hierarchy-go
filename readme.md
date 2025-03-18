@@ -1,6 +1,30 @@
+### Reimplementation in GoLang
+
+working prototype in shell github.com/michalmaruska/git-hierarchy
+
+Can do
+* walk/dump the hierarchy in topologic order
+* rebase & fetch
+
+Missing:
+* renaming
+* cloning
+* save & restore
+
+
+
+## Howto build & install
+
+./build.sh
+
+* debianization? todo
+
+
+
 
 GOPRIVATE=github.com/michalmaruska
 
+## my random notes:
 * start:
 indeed
  go mod
