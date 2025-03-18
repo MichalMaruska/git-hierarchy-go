@@ -388,6 +388,9 @@ func (segment Segment) ResetStart() {
 	setReferenceTo(TheRepository, segment.Start, segment.Base)
 }
 
+func (segment Segment) SetBase(replacement string) {
+	set_symbolic_reference(TheRepository, segment.Base.Name(), replacement)
+}
 
 // only references
 func (s Segment) Children() []*plumbing.Reference {
