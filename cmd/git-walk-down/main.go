@@ -9,6 +9,24 @@ import (
 	"github.com/go-git/go-git/v5/plumbing"
 )
 
+func dump(vertices *[]graph.NodeExpander, order []int) {
+	for _, j := range order {
+		a := (*vertices)[j]
+		gh := git_hierarchy.GetHierarchy(a)
+
+		switch v := gh.(type) {
+		case  git_hierarchy.Segment:
+			fmt.Println("segment", v.Name())
+		case  git_hierarchy.Sum:
+			fmt.Println("sum", v.Name())
+		case  git_hierarchy.Base:
+			fmt.Println("plain base reference", v.Name())
+		default:
+			fmt.Println("unexpected git_hierarchy type")
+			// error("unexpected")
+		}
+	}
+}
 
 func main() {
 
@@ -35,21 +53,7 @@ func main() {
 	git_hierarchy.CheckIfError(err)
 	// dump index -> vertices[i]
 	// fmt.Println("order:", order)
-	for _, j := range order {
-		a := (*vertices)[j]
-		gh := git_hierarchy.GetHierarchy(a)
 
-		switch v := gh.(type) {
-		case  git_hierarchy.Segment:
-			fmt.Println("segment", v.Name())
-		case  git_hierarchy.Sum:
-			fmt.Println("sum", v.Name())
-		case  git_hierarchy.Base:
-			fmt.Println("plain base reference", v.Name())
-		default:
-			fmt.Println("unexpected git_hierarchy type")
-			// error("unexpected")
-		}
-	}
-	// os.Exit(0)
+	dump(vertices, order)
+	os.Exit(0)
 }
