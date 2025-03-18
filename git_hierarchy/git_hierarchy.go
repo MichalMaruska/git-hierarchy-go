@@ -195,9 +195,9 @@ func dump_symbolic_ref(ref *plumbing.Reference) plumbing.ReferenceName {
 }
 
 func set_symbolic_reference(repository *git.Repository,
-	refName plumbing.ReferenceName, content string) *plumbing.Reference {
+	refName plumbing.ReferenceName, content plumbing.ReferenceName) *plumbing.Reference {
 	// todo: NewReferenceFromStrings(content)
-	reduced, _ := strings.CutPrefix(content, "ref: ")
+	reduced, _ := strings.CutPrefix(content.String(), "ref: ")
 
 	ref := plumbing.NewSymbolicReference(refName, plumbing.ReferenceName(reduced))
 	// ReferenceStorer
@@ -265,7 +265,7 @@ func Rename(repository *git.Repository, from string, to string) {
 	sName := branchName(full.Name())
 
 	// no.... just drop the
-	toFull := head_prefix + to
+	toFull := plumbing.ReferenceName(head_prefix + to)
 		// FullHeadName(repository, to)
 
 
