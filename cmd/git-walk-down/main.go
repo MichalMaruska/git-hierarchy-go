@@ -35,11 +35,26 @@ func main() {
 	repository, err := git.PlainOpen(".")
 	git_hierarchy.TheRepository = repository
 
-	current, err := repository.Reference(plumbing.ReferenceName("HEAD"), true)
-	// fmt.Println(current)
 
+	// ---------------------------
+	args := set.Args()
+	var top *plumbing.Reference
 
-	vertices, incidenceGraph := git_hierarchy.WalkHierarchy(current)
+	// var err Error
+	if len(args) > 0 {
+		// := leads to crash!
+		top = git_hierarchy.FullHeadName(repository, args[0])
+		if top == nil {
+			os.Exit(-1)
+		}
+		fmt.Println("Will descend from", top.Name())
+	} else {
+		current, err := repository.Head()
+		git_hierarchy.CheckIfError(err)
+		fmt.Println("Current head is", current.Name())
+		top = current
+	}
+	// ---------------------------
 
 	if false {
 		fmt.Println("Visited these git refs:")
