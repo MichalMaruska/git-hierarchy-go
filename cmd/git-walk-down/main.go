@@ -13,6 +13,17 @@ import (
 
 //  mixed named and unnamed parameters
 func replaceInHierarchy(vertices *[]graph.NodeExpander, order []int, from string, replacement string) {
+	// todo: replaceFlag must be a ReferenceName -- existing!
+	// skip also!
+	repository := git_hierarchy.TheRepository
+
+	_, err := repository.Reference(plumbing.ReferenceName(from), false)
+	git_hierarchy.CheckIfError(err, "the replacement match is invalid")
+
+	ref2, err := repository.Reference(plumbing.ReferenceName(replacement), false)
+	git_hierarchy.CheckIfError(err, "the replacement is invalid")
+
+
 	for i := range order {
 		// act:
 		gh := git_hierarchy.GetHierarchy((*vertices)[i])
