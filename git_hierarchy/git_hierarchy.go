@@ -492,12 +492,11 @@ func (a adapter) NodePrepare() graph.NodeExpander {
 }
 
 
-func (a adapter) NodeChildren()  []graph.NodeExpander {
+func (a adapter) NodeChildren() []graph.NodeExpander {
 	refs := a.gh.Children()
 	// []*plumbing.Reference
-	// convert to ...
-	// map(refs, )
-	var result = make([]graph.NodeExpander, len(refs) )
+
+	var result = make([]graph.NodeExpander, len(refs))
 
 	for i, x := range refs {
 		result[i] = adapter{Base{x}}
