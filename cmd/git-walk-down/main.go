@@ -11,6 +11,29 @@ import (
 	"github.com/pborman/getopt/v2"
 )
 
+//  mixed named and unnamed parameters
+func replaceInHierarchy(vertices *[]graph.NodeExpander, order []int, from string, replacement string) {
+	for i := range order {
+		// act:
+		gh := git_hierarchy.GetHierarchy((*vertices)[i])
+
+		switch gh.(type) {
+		case git_hierarchy.Segment:
+			segment := gh.(git_hierarchy.Segment)
+			if segment.Base.Target().String() == from {
+				println("let's replace in segment", segment.Name())
+				println(segment.Base.Target(), "vs", from)
+
+				segment.SetBase(replacement)
+			}
+		case git_hierarchy.Sum:
+			//
+		default:
+		}
+	}
+}
+
+
 func dump(vertices *[]graph.NodeExpander, order []int) {
 	for _, j := range order {
 		a := (*vertices)[j]
@@ -31,6 +54,33 @@ func dump(vertices *[]graph.NodeExpander, order []int) {
 }
 
 func main() {
+
+	// os.Args[0] == "git-walk-down"
+	set := getopt.New()
+	helpFlag := set.BoolLong("help", 'h', "display help")
+
+
+	skipOpt := set.StringLong("skip", 's', "", "skip")
+	replaceFlag := set.StringLong("replace", 't', "replace")
+
+
+
+	// cloneFlag := getopt.BoolLong("clone", 'c', "clone hierarchy, prefix")
+
+	// no errors, just fail:
+	set.SetUsage(func() {
+		getopt.PrintUsage(os.Stderr)
+		fmt.Println("\nparameter:  from  to")
+	})
+
+	// var opts = getopt.CommandLine
+	set.Parse(os.Args)
+	if *helpFlag {
+		// I want it to stdout!
+		fmt.Println(plumbing.RefRevParseRules)
+		getopt.Usage()
+		os.Exit(0)
+	}
 
 	repository, err := git.PlainOpen(".")
 	git_hierarchy.TheRepository = repository
@@ -56,6 +106,7 @@ func main() {
 	}
 	// ---------------------------
 
+	vertices, incidenceGraph := git_hierarchy.WalkHierarchy(top)
 	if false {
 		fmt.Println("Visited these git refs:")
 		for i, v := range *vertices {
@@ -68,6 +119,12 @@ func main() {
 
 	order, err := graph.TopoSort(incidenceGraph)
 	git_hierarchy.CheckIfError(err)
+
+	if *replaceFlag != "" && *skipOpt != "" {
+		replaceInHierarchy(vertices, order, *skipOpt, *replaceFlag)
+	}
+
+
 	// dump index -> vertices[i]
 	// fmt.Println("order:", order)
 
