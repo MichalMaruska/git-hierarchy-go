@@ -133,7 +133,7 @@ func mapSummandsToCommitsReverse(sum Sum) map[plumbing.Hash]*plumbing.Reference 
 
 	var summands = make(map[plumbing.Hash]*plumbing.Reference)
 
-	for _, ref := range sum.summands {
+	for _, ref := range sum.Summands {
 		hash, err := TheRepository.ResolveRevision(plumbing.Revision(ref.Name().String()))
 		CheckIfError(err, "resolving ref to hash")
 
@@ -146,7 +146,7 @@ func mapSummandsToCommitsReverse(sum Sum) map[plumbing.Hash]*plumbing.Reference 
 
 func sumParentIter(sum Sum) object.CommitIter {
 	// (*Commit, error)
-	commit, err := TheRepository.CommitObject(sum.ref.Hash())
+	commit, err := TheRepository.CommitObject(sum.Ref.Hash())
 	CheckIfError(err, "resolving ref to commit")
 
 	// git commit -> merge -> parents
@@ -216,9 +216,9 @@ func RebaseSum(sum Sum, options map[string]string ) rebaseResult {
 		// gitRuns"branch", "--force", work_branch, "HEAD")
 
 		// resolve & divide:
-		first, _ := TheRepository.Reference(sum.summands[0].Target(), false)
+		first, _ := TheRepository.Reference(sum.Summands[0].Target(), false)
 
-		others := lo.Map(sum.summands[1:],
+		others := lo.Map(sum.Summands[1:],
 			func (ref *plumbing.Reference, _ int) *plumbing.Reference {
 				pointerRef, _ := TheRepository.Reference(ref.Target(), false)
 				return pointerRef
@@ -231,7 +231,7 @@ func RebaseSum(sum Sum, options map[string]string ) rebaseResult {
 
 		var message = "Sum:" + sum.Name() + "\n\n" + first.Name().String()
 		for i, ref := range others {
-			// resolve them! maybe sum.summands should be a map N -> ref
+			// resolve them! maybe sum.Summands should be a map N -> ref
 			// pointerRef, _ := TheRepository.Reference(ref.Target(), false)
 			message += " + " + ref.Name().String()
 			if i % 3 == 0 {

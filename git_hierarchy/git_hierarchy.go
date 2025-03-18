@@ -402,18 +402,18 @@ func (s Segment) Children() []*plumbing.Reference {
 
 type  Sum struct {
 	// why pointer? and it should be const.
-	ref *plumbing.Reference
-	summands []*plumbing.Reference // can be map[int]*plumbing.Reference, or just array
+	Ref *plumbing.Reference
+	Summands []*plumbing.Reference // can be map[int]*plumbing.Reference, or just array
 }
 
 // todo: identical. Generics?
 func (s Sum) Name() string {
-	return branchName(s.ref.Name())
+	return branchName(s.Ref.Name())
 }
 
 func (s Sum) Children() []*plumbing.Reference {
 	repository := TheRepository
-	sr := s.summands
+	sr := s.Summands
 	lom.Reverse(sr)
 	return lo.Map(sr,
 		func(x *plumbing.Reference, index int) *plumbing.Reference {
