@@ -50,14 +50,14 @@ const (
 func rebaseEmptySegment(segment Segment) {
 	fmt.Println("rebase empty segment:", segment.Name())
 
-	segment.SegmentResetStart()
+	segment.ResetStart()
 	setReferenceTo(TheRepository, segment.Ref, segment.Base)
 }
 
 
 func RebaseSegmentFinish(segment Segment) rebaseResult {
 	tempHead := "temp-segment"
-	segment.SegmentResetStart()
+	segment.ResetStart()
 	// reflog etc.
 	gitRun("branch", "--force", segment.Name(), tempHead)
 	gitRun("checkout", "--no-track", "-B", segment.Name())

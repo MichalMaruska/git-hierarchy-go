@@ -378,7 +378,7 @@ func setReferenceTo(repository *git.Repository, reference *plumbing.Reference, t
 
 
 // set start to base/ref
-func (segment Segment) SegmentResetStart() {
+func (segment Segment) ResetStart() {
 	// 1. why symbolic?
 	// how to reset to
 	// err := repository.Storer.SetReference(*plumbing.Reference)
