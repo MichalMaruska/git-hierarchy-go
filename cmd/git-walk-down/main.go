@@ -36,7 +36,7 @@ func replaceInHierarchy(vertices *[]graph.NodeExpander, order []int, from string
 				println("let's replace in segment", segment.Name())
 				println(segment.Base.Target(), "vs", from)
 
-				segment.SetBase(replacement)
+				segment.SetBase(ref2)
 			}
 		case git_hierarchy.Sum:
 			//
