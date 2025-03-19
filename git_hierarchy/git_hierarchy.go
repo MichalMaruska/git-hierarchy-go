@@ -390,8 +390,12 @@ func (segment Segment) SetBase(replacement *plumbing.Reference) {
 // only references
 func (s Segment) Children() []*plumbing.Reference {
 	repository := TheRepository
-	base, err := repository.Reference(plumbing.ReferenceName(segmentBase(s.Name())), true)
-	CheckIfError(err)
+
+	// fmt.Println("Children of", s.Name())
+	baseName := segmentBase(s.Name())
+	base, err := repository.Reference(plumbing.ReferenceName(baseName), true)
+
+	CheckIfError(err, "while searching for ", baseName.String())
 	return []*plumbing.Reference{base}
 }
 
