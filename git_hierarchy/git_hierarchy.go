@@ -349,6 +349,22 @@ type  Segment struct {
 	Start *plumbing.Reference // Hash
 }
 
+func MakeSegment(name string, base plumbing.ReferenceName, head plumbing.Hash, hash plumbing.Hash) Segment {
+	return Segment{
+		Ref: plumbing.NewHashReference(plumbing.ReferenceName(HeadPrefix + name), head),
+		Base: plumbing.NewSymbolicReference(segmentBase(name), base),
+		Start: plumbing.NewHashReference(segmentStart(name), hash),
+	}
+}
+
+func (s Segment) Write() {
+	// err ?
+	TheRepository.Storer.SetReference(s.Ref)
+	TheRepository.Storer.SetReference(s.Base)
+	TheRepository.Storer.SetReference(s.Start)
+}
+
+
 func (s Segment) Name() string {
 	return branchName(s.Ref.Name())
 }
