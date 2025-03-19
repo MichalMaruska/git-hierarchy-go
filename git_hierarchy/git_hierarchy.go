@@ -66,13 +66,13 @@ func FullHeadName(repository *git.Repository, refName string) *plumbing.Referenc
 }
 
 // const
-var head_prefix string
+var HeadPrefix string
 
 // func (s, suffix string) (before string, found bool)
 // "refs/heads/"
 func init(){
 	// note:
-	head_prefix, _ = strings.CutSuffix(plumbing.RefRevParseRules[3], "%s")
+	HeadPrefix, _ = strings.CutSuffix(plumbing.RefRevParseRules[3], "%s")
 }
 
 const sumPattern = "refs/sums/%s"
@@ -249,7 +249,7 @@ func rename_reference(repository *git.Repository, ref *plumbing.Reference, newNa
 // no way to override
 func branchName(full plumbing.ReferenceName) string {
 	// fmt.Println("extract name from", full.Name().String())
-	sName, _ := strings.CutPrefix(full.String(), head_prefix) // todo: strip
+	sName, _ := strings.CutPrefix(full.String(), HeadPrefix) // todo: strip
 	return sName
 }
 
@@ -265,13 +265,13 @@ func Rename(repository *git.Repository, from string, to string) {
 	sName := branchName(full.Name())
 
 	// no.... just drop the
-	toFull := plumbing.ReferenceName(head_prefix + to)
+	toFull := plumbing.ReferenceName(HeadPrefix + to)
 		// FullHeadName(repository, to)
 
 
 	fmt.Println("would use ", sName, "as base for derived references")
 
-	newName, _ := strings.CutPrefix(to, head_prefix)
+	newName, _ := strings.CutPrefix(to, HeadPrefix)
 
 	// begin transaction!
 	rename_reference(repository, full, plumbing.ReferenceName(toFull))
@@ -443,8 +443,8 @@ func Convert(ref *plumbing.Reference) GitHierarchy {
 
 	// todo: must be head, not tag or ...
 	name := ref.Name().String()
-	// assert(string.isPrefix(head_prefix, name)
-	name, _ = strings.CutPrefix(name, head_prefix)
+	// assert(string.isPrefix(HeadPrefix, name)
+	name, _ = strings.CutPrefix(name, HeadPrefix)
 
 	if is, summands := isSum(name, repository); is {
 		return Sum{ref, summands}
