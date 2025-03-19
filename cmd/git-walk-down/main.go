@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"github.com/michalmaruska/git-hierarchy/git_hierarchy"
 	"github.com/michalmaruska/git-hierarchy/graph"
@@ -72,7 +73,8 @@ func main() {
 
 
 	skipOpt := set.StringLong("skip", 's', "", "skip")
-	replaceFlag := set.StringLong("replace", 't', "replace")
+	replaceFlag := set.StringLong("replace", 't', "", "replace")
+
 
 
 
@@ -92,6 +94,13 @@ func main() {
 		getopt.Usage()
 		os.Exit(0)
 	}
+
+	// sanity check:
+	if (*replaceFlag != "") != (*skipOpt != "") {
+		log.Fatal("replace & match must come in pair!")
+		getopt.Usage()
+	}
+
 
 	repository, err := git.PlainOpen(".")
 	git_hierarchy.TheRepository = repository
