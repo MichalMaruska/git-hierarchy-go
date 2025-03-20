@@ -358,10 +358,12 @@ func MakeSegment(name string, base plumbing.ReferenceName, head plumbing.Hash, h
 }
 
 func (s Segment) Write() {
-	// err ?
-	TheRepository.Storer.SetReference(s.Ref)
-	TheRepository.Storer.SetReference(s.Base)
-	TheRepository.Storer.SetReference(s.Start)
+	err := TheRepository.Storer.SetReference(s.Ref)
+	CheckIfError(err)
+	err = TheRepository.Storer.SetReference(s.Base)
+	CheckIfError(err)
+	err = TheRepository.Storer.SetReference(s.Start)
+	CheckIfError(err)
 }
 
 
@@ -422,6 +424,13 @@ type  Sum struct {
 	Summands []*plumbing.Reference // can be map[int]*plumbing.Reference, or just array
 }
 
+func MakeSum(name string, commitId plumbing.Hash, summands []*plumbing.Reference) Sum {
+	return Sum{
+		Ref: plumbing.NewHashReference(plumbing.ReferenceName(HeadPrefix + name), commitId),
+		Summands: summands}
+}
+
+
 // todo: identical. Generics?
 func (s Sum) Name() string {
 	return branchName(s.Ref.Name())
@@ -437,6 +446,14 @@ func (s Sum) Children() []*plumbing.Reference {
 			CheckIfError(err)
 			return ref
 		})
+}
+func (s Sum) Write() {
+	err:= TheRepository.Storer.SetReference(s.Ref)
+	CheckIfError(err)
+	for _, ref := range s.Summands {
+		err = TheRepository.Storer.SetReference(ref)
+		CheckIfError(err)
+	}
 }
 
 type Base struct {
