@@ -123,18 +123,10 @@ func cloneHierarchy(vertices *[]graph.NodeExpander, order []int, prefix string) 
 
 
 //  mixed named and unnamed parameters
-func replaceInHierarchy(vertices *[]graph.NodeExpander, order []int, from string, replacement string) {
+func replaceInHierarchy(vertices *[]graph.NodeExpander, order []int, remapped map[string]*plumbing.Reference) {
+
 	// todo: replaceFlag must be a ReferenceName -- existing!
 	// skip also!
-	repository := git_hierarchy.TheRepository
-
-	_, err := repository.Reference(plumbing.ReferenceName(from), false)
-	git_hierarchy.CheckIfError(err, "the replacement match is invalid")
-
-	ref2, err := repository.Reference(plumbing.ReferenceName(replacement), false)
-	git_hierarchy.CheckIfError(err, "the replacement is invalid")
-
-
 	for i := range order {
 		// act:
 		gh := git_hierarchy.GetHierarchy((*vertices)[i])
@@ -142,11 +134,13 @@ func replaceInHierarchy(vertices *[]graph.NodeExpander, order []int, from string
 		switch gh.(type) {
 		case git_hierarchy.Segment:
 			segment := gh.(git_hierarchy.Segment)
-			if segment.Base.Target().String() == from {
-				println("let's replace in segment", segment.Name())
-				println(segment.Base.Target(), "vs", from)
 
-				segment.SetBase(ref2)
+			found, value := remap(segment.Base.Target(), remapped)
+			if found {
+				println("let's replace in segment", segment.Name())
+				println(segment.Base.Target(), "vs", value)
+
+				segment.SetBase(value)
 			}
 		case git_hierarchy.Sum:
 			//
@@ -198,7 +192,37 @@ func main() {
 	})
 
 	// var opts = getopt.CommandLine
-	set.Parse(os.Args)
+	var current = ""
+	var remapped = make(map[string]*plumbing.Reference)
+
+	repository, err := git.PlainOpen(".")
+	git_hierarchy.TheRepository = repository
+
+	if err := set.Getopt(os.Args, func(o getopt.Option) bool {
+		fmt.Println("looking at option: ", o.LongName())
+		if o.LongName() == "skip" {
+			current = o.Value().String()
+		} else if o.LongName() == "replace" {
+			from := current
+			replacement := o.Value().String()
+
+			fmt.Println("let's resolve the values: ", from, "and", replacement)
+			_, err := repository.Reference(plumbing.ReferenceName(from), false)
+			git_hierarchy.CheckIfError(err, "the replacement match is invalid")
+
+			ref2, err := repository.Reference(plumbing.ReferenceName(replacement), false)
+			git_hierarchy.CheckIfError(err, "the replacement is invalid")
+			// return false
+
+			log.Print("Will replace any use of ", from, "with reference to ", ref2)
+			remapped[from] = ref2
+		}
+		return true }); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		set.PrintUsage(os.Stderr)
+		os.Exit(1)
+	}
+
 	if *helpFlag {
 		// I want it to stdout!
 		fmt.Println(plumbing.RefRevParseRules)
@@ -211,11 +235,6 @@ func main() {
 		log.Fatal("replace & match must come in pair!")
 		getopt.Usage()
 	}
-
-
-	repository, err := git.PlainOpen(".")
-	git_hierarchy.TheRepository = repository
-
 
 	// ---------------------------
 	args := set.Args()
@@ -251,8 +270,9 @@ func main() {
 	order, err := graph.TopoSort(incidenceGraph)
 	git_hierarchy.CheckIfError(err)
 
+
 	if *replaceFlag != "" && *skipOpt != "" {
-		replaceInHierarchy(vertices, order, *skipOpt, *replaceFlag)
+		replaceInHierarchy(vertices, order, remapped)
 	}
 
 	if *cloneOpt != "" {
