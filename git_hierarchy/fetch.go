@@ -18,7 +18,7 @@ func SplitRemoteRef(refName plumbing.ReferenceName) (string, string) {
 
 	// TheRepository.Remotes()
 	remote := rest[:i]
-	remoteBranch := rest[i:]
+	remoteBranch := rest[i+1:]
 
 	fmt.Println("remote:", remote)
 	return remote, remoteBranch
