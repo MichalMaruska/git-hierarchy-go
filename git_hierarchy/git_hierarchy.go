@@ -89,7 +89,7 @@ func referenceExists(repository *git.Repository, name string) bool {
 	return (error == nil)
 }
 
-func sumSummand(name string, n int) plumbing.ReferenceName {
+func SumSummand(name string, n int) plumbing.ReferenceName {
 	return plumbing.ReferenceName(fmt.Sprintf(sumSummandPattern, name, n))
 }
 
@@ -303,15 +303,9 @@ func Rename(repository *git.Repository, from string, to string) {
 		prefix := sumSummandPrefix + sName + "/"
 
 		for _, s := range summands {
-			// refIter.ForEach( func(ref *plumbing.Reference) error {
-			// fmt.Println(branch.Hash().String(), branch.Name())
-			// match
-			// func (r *Repository) References() (storer.ReferenceIter, error)
-			// ref, err := repository.Reference(sumSummand(sName, n), false)
-			// CheckIfError(err)  ParseUint
 			end, _ := strings.CutPrefix(s.Name().String(), prefix)
 			n, _ := strconv.Atoi(end)
-			rename_symbolic_reference(repository, s, sumSummand(newName, n))
+			rename_symbolic_reference(repository, s, SumSummand(newName, n))
 		}
 	}
 
