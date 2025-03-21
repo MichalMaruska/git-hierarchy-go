@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"slices"
+
 	"github.com/michalmaruska/git-hierarchy/git_hierarchy"
 	"github.com/michalmaruska/git-hierarchy/graph"
 
@@ -78,7 +80,7 @@ func cloneHierarchy(vertices *[]graph.NodeExpander, order []int, prefix string) 
 	// so what's the difference between this & make() ?
 
 	// can I simplify this iterator?
-	for i := range order {
+	for i := range slices.Backward(order) {
 		gh := git_hierarchy.GetHierarchy((*vertices)[i])
 
 		fmt.Println("cloning", gh.Name() )
