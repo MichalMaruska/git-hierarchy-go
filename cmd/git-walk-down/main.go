@@ -14,58 +14,65 @@ import (
 	"github.com/pborman/getopt/v2"
 )
 
+var verbose = false
 
-// base
+func remap(ref plumbing.ReferenceName, remapped map[string]*plumbing.Reference) plumbing.ReferenceName {
+	if val, found := remapped[ref.String()]; found {
+		// fmt.Println("rewriting")
+		ref = val.Name()
+	}
+	return ref
+}
+
 func cloneSegment(segment git_hierarchy.Segment, newName string,
 	remapped map[string]*plumbing.Reference) git_hierarchy.Segment {
 
-	// newRef := plumbing.ReferenceName(git_hierarchy.HeadPrefix + newName)
-	fmt.Println("new segment ", newName)
-
-	base := segment.Base
-	if val, found := remapped[base.Name().String()]; found {
-		// so what is
-		base = val
+	if verbose {
+		fmt.Println("new segment", newName)
 	}
+	base := remap(segment.Base.Target(), remapped)
 
 	newSegment := git_hierarchy.MakeSegment(
-		newName, base.Name(), // fixme!
+		newName,
+		base,
 		segment.Ref.Hash(),
 		segment.Start.Hash())
-	/*
-			hash := segment.Ref.Hash()
-			newSegment := git_hierarchy.Segment{
-				Ref: plumbing.NewHashReference(newName, hash),
-				Base: segmentBase(newName),
-				Start: segment.Start}
-	*/
-	fmt.Println("Segment", newSegment.Ref.Name(), // hash
-		"base", newSegment.Base.Name(),
-		"->", newSegment.Base.Target(),
-		"start", newSegment.Start.Name(), "->", newSegment.Start.Hash())
-
+	if verbose {
+		fmt.Println("Segment", newSegment.Ref.Name(), // hash
+			"base", newSegment.Base.Name(),
+			"->", newSegment.Base.Target(),
+			"start", newSegment.Start.Name(), "->", newSegment.Start.Hash())
+	}
 	newSegment.Write()
 	return newSegment
 }
 
-func cloneSum(sum git_hierarchy.Sum, newName string, remapped map[string]*plumbing.Reference) git_hierarchy.Sum {
+func cloneSum(sum git_hierarchy.Sum, newName string,
+	remapped map[string]*plumbing.Reference) git_hierarchy.Sum {
+
 	commitId := sum.Ref.Hash()
 	newSum := git_hierarchy.MakeSum(newName, commitId,
 		make([]*plumbing.Reference, len(sum.Summands)))
 
 	// list-of new summands.
+	if verbose {
+		fmt.Println("Look at summands")
+	}
 
-	// create sum, with summands....
+	// convert the summands....
 	for i, summand := range sum.Summands {
-		newTarget := summand.Target()
-		// points into remapped[]
-		// then rewrite.
+		newTarget := remap(summand.Target(), remapped)
 
-		if val, found := remapped[newTarget.String()]; found {
-			newTarget = val.Name()
+		number := git_hierarchy.SumSummandIndex(sum.Name(), summand.Name())
+
+		if verbose {
+			fmt.Println("another summand", number, newTarget)
 		}
+
+		newSummandName := git_hierarchy.SumSummand(newName, number)
+
 		newSum.Summands[i] = plumbing.NewSymbolicReference(
-			summand.Name(),
+			newSummandName,
 			newTarget)
 	}
 
