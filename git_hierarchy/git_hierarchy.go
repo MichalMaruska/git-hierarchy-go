@@ -2,6 +2,7 @@ package git_hierarchy
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 	"strconv"
 	"os"
@@ -92,6 +93,21 @@ func referenceExists(repository *git.Repository, name string) bool {
 func SumSummand(name string, n int) plumbing.ReferenceName {
 	return plumbing.ReferenceName(fmt.Sprintf(sumSummandPattern, name, n))
 }
+
+func SumSummandIndex(sumname string, summand plumbing.ReferenceName) int {
+
+	re := regexp.MustCompile(`refs/sums/(.*)/([[:digit:]]*)`)
+	matches := re.FindStringSubmatch(summand.String())
+
+	// assert sumname == sum.Name()
+	if (sumname != matches[1]) {
+		panic("bad")
+	}
+
+	i, _ := strconv.Atoi(matches[2])
+	return i
+}
+
 
 /* todo: */
 
