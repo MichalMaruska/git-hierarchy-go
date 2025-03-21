@@ -411,8 +411,8 @@ func (segment Segment) ResetStart() {
 	setReferenceTo(TheRepository, segment.Start, segment.Base)
 }
 
-func (segment Segment) SetBase(replacement *plumbing.Reference) {
-	set_symbolic_reference(TheRepository, segment.Base.Name(), replacement.Name())
+func (segment Segment) SetBase(replacement plumbing.ReferenceName) {
+	set_symbolic_reference(TheRepository, segment.Base.Name(), replacement)
 }
 
 // only references
