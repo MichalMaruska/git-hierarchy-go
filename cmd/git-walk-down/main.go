@@ -83,9 +83,9 @@ func cloneSum(sum git_hierarchy.Sum, newName string,
 	return newSum
 }
 
-func cloneHierarchy(vertices *[]graph.NodeExpander, order []int, prefix string) {
+func cloneHierarchy(vertices *[]graph.NodeExpander, order []int, prefix string,
+	renamed map[string]*plumbing.Reference) {
 	// assignment to entry in nil map
-	var renamed  = make(map[string]*plumbing.Reference) // Name
 	// so what's the difference between this & make() ?
 
 	// can I simplify this iterator?
@@ -271,12 +271,11 @@ func main() {
 	git_hierarchy.CheckIfError(err)
 
 
-	if *replaceFlag != "" && *skipOpt != "" {
-		replaceInHierarchy(vertices, order, remapped)
-	}
 
 	if *cloneOpt != "" {
-		cloneHierarchy(vertices, order, *cloneOpt)
+		cloneHierarchy(vertices, order, *cloneOpt, remapped)
+	} else if *replaceFlag != "" && *skipOpt != "" {
+		replaceInHierarchy(vertices, order, remapped)
 	}
 
 	// dump index -> vertices[i]
