@@ -16,12 +16,14 @@ import (
 
 var verbose = false
 
-func remap(ref plumbing.ReferenceName, remapped map[string]*plumbing.Reference) plumbing.ReferenceName {
+func remap(ref plumbing.ReferenceName,
+	remapped map[string]*plumbing.Reference) (bool, plumbing.ReferenceName) {
 	if val, found := remapped[ref.String()]; found {
 		// fmt.Println("rewriting")
 		ref = val.Name()
+		return true, ref
 	}
-	return ref
+	return false, ref
 }
 
 func cloneSegment(segment git_hierarchy.Segment, newName string,
@@ -30,7 +32,7 @@ func cloneSegment(segment git_hierarchy.Segment, newName string,
 	if verbose {
 		fmt.Println("new segment", newName)
 	}
-	base := remap(segment.Base.Target(), remapped)
+	_, base := remap(segment.Base.Target(), remapped)
 
 	newSegment := git_hierarchy.MakeSegment(
 		newName,
@@ -61,7 +63,7 @@ func cloneSum(sum git_hierarchy.Sum, newName string,
 
 	// convert the summands....
 	for i, summand := range sum.Summands {
-		newTarget := remap(summand.Target(), remapped)
+		_, newTarget := remap(summand.Target(), remapped)
 
 		number := git_hierarchy.SumSummandIndex(sum.Name(), summand.Name())
 
