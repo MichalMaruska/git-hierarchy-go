@@ -20,7 +20,8 @@ func SplitRemoteRef(refName plumbing.ReferenceName) (string, string) {
 	remote := rest[:i]
 	remoteBranch := rest[i+1:]
 
-	fmt.Println("remote:", remote)
+	if verbose {fmt.Println("remote:", remote)}
+
 	return remote, remoteBranch
 }
 
@@ -49,7 +50,7 @@ func FetchUpstreamOf(ref *plumbing.Reference) {
 	} else if refName.IsBranch() {
 
 		// it seems I must checkout for "git pull"
-		fmt.Println("it's a branch, remote?")
+		if verbose {fmt.Println("it's a branch, remote?")}
 
 		config, err := TheRepository.Storer.Config()
 		// config.LoadConfig(config.LocalScope)
@@ -64,22 +65,24 @@ func FetchUpstreamOf(ref *plumbing.Reference) {
 			return
 		}
 
-		println("it follows a remote branch -- found info: ",
-			branchInfo.Name, branchInfo.Remote, branchInfo.Merge)
+		if verbose {
+			println("it follows a remote branch -- found info: ",
+				branchInfo.Name, branchInfo.Remote, branchInfo.Merge)
+		}
 
 		// is it on it?
 		if RefsToSameCommit(ref, remoteBranch(branchInfo.Remote, branchInfo.Merge)) {
-			println("so the remote branch is identical, let's fetch")
+			if verbose {
+				println("so the remote branch is identical, let's fetch")
+			}
 			// gitRun("remote","prune", br.Remote)
 			gitRun("fetch", "--prune", "--progress", "--verbose",
-				branchInfo.Remote, branchInfo.Merge.String() + ":" + refName.String())
+				branchInfo.Remote,
+				// refspec:
+				branchInfo.Merge.String() + ":" + refName.String())
 			// gitRun("fetch", branchInfo.Remote, string(branchInfo.Merge) + ":")
 		}
-		// git fetch debian refs/heads/main:
 
-		// plumbing.ReferenceName
-		// look at config  merge
-		// git config branch.base.merge
 		// remote
 		// func (r *Remote) List(o *ListOptions) (rfs []*plumbing.Reference, err error)
 
