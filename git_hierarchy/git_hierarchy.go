@@ -254,7 +254,7 @@ func rename_symbolic_reference(repository *git.Repository,
 	CheckIfError(err)
 }
 
-var verbose = true
+var verbose = false
 
 // not symbolic
 func rename_reference(repository *git.Repository, ref *plumbing.Reference, newName plumbing.ReferenceName) {
