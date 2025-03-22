@@ -205,10 +205,16 @@ func main() {
 	git_hierarchy.TheRepository = repository
 
 	if err := set.Getopt(os.Args, func(o getopt.Option) bool {
-		fmt.Println("looking at option: ", o.LongName())
-		if o.LongName() == "skip" {
+		// fmt.Println("looking at option: ", o.LongName())
+
+		switch o.LongName() {
+		case "help":
+			set.PrintUsage(os.Stdout)
+			os.Exit(0)
+		case "skip": {
 			current = o.Value().String()
-		} else if o.LongName() == "replace" {
+		}
+		case "replace": {
 			from := current
 			replacement := o.Value().String()
 
@@ -223,23 +229,19 @@ func main() {
 			log.Print("Will replace any use of ", from, "with reference to ", ref2)
 			remapped[from] = ref2
 		}
+		}
 		return true }); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		set.PrintUsage(os.Stderr)
 		os.Exit(1)
 	}
 
-	if *helpFlag {
-		// I want it to stdout!
-		fmt.Println(plumbing.RefRevParseRules)
-		getopt.Usage()
-		os.Exit(0)
-	}
 
 	// sanity check:
 	if (*replaceFlag != "") != (*skipOpt != "") {
 		log.Fatal("replace & match must come in pair!")
-		getopt.Usage()
+		set.PrintUsage(os.Stderr)
+		os.Exit(2)
 	}
 
 	// ---------------------------
