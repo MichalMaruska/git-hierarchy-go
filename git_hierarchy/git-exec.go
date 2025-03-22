@@ -31,7 +31,7 @@ func gitRunStatus(args ...string) error {
 		log.Fatal(err)
 	}
 
-	if err := cmd.Start(); err != nil {
+	if err = cmd.Start(); err != nil {
 		log.Fatal(err)
 	}
 
