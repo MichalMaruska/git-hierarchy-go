@@ -214,7 +214,6 @@ func main() {
 
 	if err := set.Getopt(os.Args, func(o getopt.Option) bool {
 		// fmt.Println("looking at option: ", o.LongName())
-
 		switch o.LongName() {
 		case "help":
 			set.PrintUsage(os.Stdout)
@@ -232,7 +231,6 @@ func main() {
 
 			ref2, err := repository.Reference(plumbing.ReferenceName(replacement), false)
 			git_hierarchy.CheckIfError(err, "the replacement is invalid")
-			// return false
 
 			log.Print("Will replace any use of ", from, "with reference to ", ref2)
 			remapped[from] = ref2
@@ -252,10 +250,8 @@ func main() {
 		os.Exit(2)
 	}
 
-	// ---------------------------
 	args := set.Args()
 	var top *plumbing.Reference
-
 	// var err Error
 	if len(args) > 0 {
 		// := leads to crash!
@@ -270,13 +266,11 @@ func main() {
 		fmt.Println("Current head is", current.Name())
 		top = current
 	}
-	// ---------------------------
 
 	vertices, incidenceGraph := git_hierarchy.WalkHierarchy(top)
 
 	order, err := graph.TopoSort(incidenceGraph)
 	git_hierarchy.CheckIfError(err)
-
 
 
 	if *cloneOpt != "" {
