@@ -179,8 +179,16 @@ func dump(vertices *[]graph.NodeExpander, incidenceGraph *graph.Graph, order []i
 	}
 }
 
-func main() {
+func findGitRepository() (*git.Repository, error){
+	openOptions := git.PlainOpenOptions{
+		DetectDotGit: true,
+	}
+	err := openOptions.Validate()
+	git_hierarchy.CheckIfError(err, "options")
+	return git.PlainOpenWithOptions(".", &openOptions)
+}
 
+func main() {
 	// os.Args[0] == "git-walk-down"
 	set := getopt.New()
 	// helpFlag
@@ -201,7 +209,8 @@ func main() {
 	var current = ""
 	var remapped = make(map[string]*plumbing.Reference)
 
-	repository, err := git.PlainOpen(".")
+	repository, err := findGitRepository()
+	git_hierarchy.CheckIfError(err, "looking for .git repo")
 	git_hierarchy.TheRepository = repository
 
 	if err := set.Getopt(os.Args, func(o getopt.Option) bool {
