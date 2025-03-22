@@ -86,15 +86,15 @@ func main() {
 
 	// no errors, just fail:
 	getopt.SetUsage(func() {
+		// the default:
 		getopt.PrintUsage(os.Stderr)
-		fmt.Println("\nparameter:  from  to")
 	})
+	getopt.SetParameters("[top-reference]")
+
 	getopt.Parse() // os.Args
 
 	if *helpFlag {
-		// I want it to stdout!
-		fmt.Println(plumbing.RefRevParseRules)
-		getopt.Usage()
+		getopt.PrintUsage(os.Stdout)
 		os.Exit(0)
 	}
 
@@ -112,7 +112,7 @@ func main() {
 	args := getopt.Args()
 
 	var top *plumbing.Reference
-	// var err Error
+
 	if len(args) > 0 {
 		// := leads to crash!
 		top = git_hierarchy.FullHeadName(repository, args[0])
