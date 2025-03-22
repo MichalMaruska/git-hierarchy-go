@@ -212,7 +212,7 @@ func main() {
 	git_hierarchy.CheckIfError(err, "looking for .git repo")
 	git_hierarchy.TheRepository = repository
 
-	if err := set.Getopt(os.Args, func(o getopt.Option) bool {
+	if err = set.Getopt(os.Args, func(o getopt.Option) bool {
 		// fmt.Println("looking at option: ", o.LongName())
 		switch o.LongName() {
 		case "help":
@@ -226,10 +226,11 @@ func main() {
 			replacement := o.Value().String()
 
 			fmt.Println("let's resolve the values: ", from, "and", replacement)
-			_, err := repository.Reference(plumbing.ReferenceName(from), false)
+			_, err = repository.Reference(plumbing.ReferenceName(from), false)
 			git_hierarchy.CheckIfError(err, "the replacement match is invalid")
 
-			ref2, err := repository.Reference(plumbing.ReferenceName(replacement), false)
+			var ref2 *plumbing.Reference
+			ref2, err = repository.Reference(plumbing.ReferenceName(replacement), false)
 			git_hierarchy.CheckIfError(err, "the replacement is invalid")
 
 			log.Print("Will replace any use of ", from, "with reference to ", ref2)
@@ -252,19 +253,18 @@ func main() {
 
 	args := set.Args()
 	var top *plumbing.Reference
-	// var err Error
 	if len(args) > 0 {
-		// := leads to crash!
 		top = git_hierarchy.FullHeadName(repository, args[0])
 		if top == nil {
 			os.Exit(-1)
 		}
 		fmt.Println("Will descend from", top.Name())
 	} else {
-		current, err := repository.Head()
+		var currentBranch *plumbing.Reference
+		currentBranch, err = repository.Head()
 		git_hierarchy.CheckIfError(err)
-		fmt.Println("Current head is", current.Name())
-		top = current
+		fmt.Println("Current head is", currentBranch.Name())
+		top = currentBranch
 	}
 
 	vertices, incidenceGraph := git_hierarchy.WalkHierarchy(top)
