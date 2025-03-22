@@ -25,7 +25,9 @@ func RefsToSameCommit(ref1 *plumbing.Reference, ref2 *plumbing.Reference) bool {
 	hashRef, err := storer.ResolveReference(TheRepository.Storer,ref1.Name())
 	// ReferenceStorer, n plumbing.ReferenceName)
 	CheckIfError(err, "resolving reference to hash")
-	fmt.Println("ResolveReference:", hashRef.Hash())
+	if verbose {
+		fmt.Println("ResolveReference:", hashRef.Hash())
+	}
 
 	/*
 	var hash plumbing.Hash
@@ -131,7 +133,9 @@ func mapSummandsToCommitsReverse(sum Sum) map[plumbing.Hash]*plumbing.Reference 
 		hash, err := TheRepository.ResolveRevision(plumbing.Revision(ref.Name().String()))
 		CheckIfError(err, "resolving ref to hash")
 
-		fmt.Println("summand", ref.Name(), "points at", hash)
+		if verbose {
+			fmt.Println("summand", ref.Name(), "points at", hash)
+		}
 		summands[*hash] = ref
 	}
 
