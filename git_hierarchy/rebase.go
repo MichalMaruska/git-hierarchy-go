@@ -76,19 +76,13 @@ func RebaseSegment(segment Segment, options map[string]string ) rebaseResult {
 	//  *Reference
 	mark := plumbing.NewSymbolicReference(".segment-cherry-pick", segment.Ref.Name())
 	err := repository.Storer.SetReference(mark)
+	CheckIfError(err, "setting a reference")
 
-	// onto :=  segmentBase(seg.Name())
 	onto := segment.Base
 	start := segment.Start.Name().String()
 
-	// err := repository.Storer.CheckAndSetReference(newRef, s.Start)
-	onto_ref, err := storer.ResolveReference(repository.Storer, onto.Name()) // why Name?
-	CheckIfError(err, "resolving new base")
-
-	onto_ref = onto
-
 	// same commits -- hash
-	if RefsToSameCommit(onto_ref, segment.Start) {
+	if RefsToSameCommit(onto, segment.Start) {
 		return RebaseNothing
 	}
 
