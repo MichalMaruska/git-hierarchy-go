@@ -188,21 +188,6 @@ func findGitRepository() (*git.Repository, error){
 	return git.PlainOpenWithOptions(".", &openOptions)
 }
 
-/*
-   PrintUsage
- */
-
-func usage(set *getopt.Set){
-	writer := os.Stderr
-	// set.PrintUsage(writer)
-	fmt.Fprintln(writer, set.Program(), set.UsageLine())
-	set.PrintOptions(writer)
-	// [-h] [-c value] [-s value] [-t value]
-
-	fmt.Fprintln(writer, "\nparameter:  from  to")
-	fmt.Fprintln(writer, "Example\n -s refs/heads/debian-unstable -t refs/remotes/debian/debian-unstable mmc-fork ")
-}
-
 func main() {
 	// os.Args[0] == "git-walk-down"
 	set := getopt.New()
@@ -214,13 +199,12 @@ func main() {
 
 	cloneOpt := set.StringLong("clone", 'c', "", "clone using a prefix")
 
-	// no errors, just fail:
-	// I don't use Parse(), but Getopt() so!!!
-	set.SetUsage(func() {usage(set)}) // to display usage on error.
-
 	set.SetParameters("[top-reference]")
 
+	// I don't use Parse(), but Getopt() so!!!
+	// set.SetUsage(func() {usage(set)}) // to display usage on error.
 	// var opts = getopt.CommandLine
+
 	var current = ""
 	var remapped = make(map[string]*plumbing.Reference)
 
@@ -256,8 +240,6 @@ func main() {
 		}
 		return true }); err != nil {
 
-		// usage(set)
-		fmt.Fprintln(os.Stderr, "received error")
 		fmt.Fprintln(os.Stderr, err)
 		set.PrintUsage(os.Stderr)
 		os.Exit(1)
