@@ -17,7 +17,8 @@ func usage() {
 	getopt.PrintUsage(os.Stderr)
 }
 
-func startRebase(top *plumbing.Reference) {
+var verbose = false
+func startRebase(top *plumbing.Reference, noFetch bool) {
 	vertices, incidenceGraph := git_hierarchy.WalkHierarchy(top)
 
 	order, err := graph.TopoSort(incidenceGraph)
@@ -27,14 +28,17 @@ func startRebase(top *plumbing.Reference) {
 	NewReferenceSliceIter(
 	    Map(order, func (index int) { git_hierarchy.GetHierarchy((*vertices)[index]) }
 	*/
-	// I need reverse
 	for _, j := range slices.Backward(order) {
 		gh := git_hierarchy.GetHierarchy((*vertices)[j])
 
-		fmt.Println("processing:", gh.Name())
+		if verbose {
+			fmt.Println("\n** Processing:", gh.Name())
+		}
 		switch gh.(type) {
 		case git_hierarchy.Base:
-			git_hierarchy.FetchUpstreamOf(gh.(git_hierarchy.Base).Ref)
+			if !noFetch {
+				git_hierarchy.FetchUpstreamOf(gh.(git_hierarchy.Base).Ref)
+			}
 		default:
 			status := git_hierarchy.RebaseNode(gh)
 			if status == git_hierarchy.RebaseFailed {
@@ -78,6 +82,7 @@ func contRebase(repository *git.Repository) {
 func main() {
 	helpFlag := getopt.BoolLong("help", 'h', "display help")
 	contFlag := getopt.BoolLong("continue", 'c', "continue after manual fix")
+	fetchFlag := getopt.BoolLong("nofetch", 'f', "don't fetch from remote branches")
 
 	// no errors, just fail:
 	getopt.SetUsage(func() {
@@ -122,9 +127,7 @@ func main() {
 		top = current
 	}
 
+	startRebase(top, *fetchFlag)
 
-	startRebase(top)
-
-	// fmt.Println(current)
 	os.Exit(0)
 }
