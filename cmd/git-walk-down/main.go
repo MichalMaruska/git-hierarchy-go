@@ -150,7 +150,17 @@ func replaceInHierarchy(vertices *[]graph.NodeExpander, order []int, remapped ma
 }
 
 
-func dump(vertices *[]graph.NodeExpander, order []int) {
+func dump(vertices *[]graph.NodeExpander, incidenceGraph *graph.Graph, order []int) {
+	if false {
+		fmt.Println("Visited these git refs:")
+		for i, v := range *vertices {
+			fmt.Println(i, "->", v.NodeIdentity())
+		}
+
+		fmt.Println("Now edges:")
+		graph.DumpGraph(incidenceGraph)
+	}
+
 	for _, j := range order {
 		a := (*vertices)[j]
 		gh := git_hierarchy.GetHierarchy(a)
@@ -257,15 +267,6 @@ func main() {
 	// ---------------------------
 
 	vertices, incidenceGraph := git_hierarchy.WalkHierarchy(top)
-	if false {
-		fmt.Println("Visited these git refs:")
-		for i, v := range *vertices {
-			fmt.Println(i, "->", v.NodeIdentity())
-		}
-
-		fmt.Println("Now edges:")
-		graph.DumpGraph(incidenceGraph)
-	}
 
 	order, err := graph.TopoSort(incidenceGraph)
 	git_hierarchy.CheckIfError(err)
@@ -278,9 +279,7 @@ func main() {
 		replaceInHierarchy(vertices, order, remapped)
 	}
 
-	// dump index -> vertices[i]
-	// fmt.Println("order:", order)
 
-	dump(vertices, order)
+	dump(vertices, incidenceGraph, order)
 	os.Exit(0)
 }
