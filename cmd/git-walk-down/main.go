@@ -9,7 +9,6 @@ import (
 	"github.com/michalmaruska/git-hierarchy/git_hierarchy"
 	"github.com/michalmaruska/git-hierarchy/graph"
 
-	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/pborman/getopt/v2"
 )
@@ -179,15 +178,6 @@ func dump(vertices *[]graph.NodeExpander, incidenceGraph *graph.Graph, order []i
 	}
 }
 
-func findGitRepository() (*git.Repository, error){
-	openOptions := git.PlainOpenOptions{
-		DetectDotGit: true,
-	}
-	err := openOptions.Validate()
-	git_hierarchy.CheckIfError(err, "options")
-	return git.PlainOpenWithOptions(".", &openOptions)
-}
-
 func main() {
 	// os.Args[0] == "git-walk-down"
 	set := getopt.New()
@@ -208,7 +198,7 @@ func main() {
 	var current = ""
 	var remapped = make(map[string]*plumbing.Reference)
 
-	repository, err := findGitRepository()
+	repository, err := git_hierarchy.FindGitRepository()
 	git_hierarchy.CheckIfError(err, "looking for .git repo")
 	git_hierarchy.TheRepository = repository
 

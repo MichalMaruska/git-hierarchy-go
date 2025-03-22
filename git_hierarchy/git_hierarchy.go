@@ -45,6 +45,14 @@ func Unimplemented(){
 	os.Exit(1)
 }
 
+func FindGitRepository() (*git.Repository, error){
+	openOptions := git.PlainOpenOptions{
+		DetectDotGit: true,
+	}
+	err := openOptions.Validate()
+	CheckIfError(err, "options")
+	return git.PlainOpenWithOptions(".", &openOptions)
+}
 
 
 // MatchAny returns true if any of the RefSpec match with the given ReferenceName.

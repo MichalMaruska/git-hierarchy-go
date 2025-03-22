@@ -99,7 +99,7 @@ func main() {
 	}
 
 	// plan: collect the graph, linearized,
-	repository, err := git.PlainOpen(".")
+	repository, err := git_hierarchy.FindGitRepository()
 	git_hierarchy.CheckIfError(err, "finding repository")
 	git_hierarchy.TheRepository = repository
 
