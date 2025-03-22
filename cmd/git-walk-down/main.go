@@ -183,17 +183,13 @@ func main() {
 
 	// os.Args[0] == "git-walk-down"
 	set := getopt.New()
-	helpFlag := set.BoolLong("help", 'h', "display help")
+	// helpFlag
+	_ = set.BoolLong("help", 'h', "display help")
 
-
-	skipOpt := set.StringLong("skip", 's', "", "skip")
-	replaceFlag := set.StringLong("replace", 't', "", "replace")
+	skipOpt := set.StringLong("skip", 's', "", "skip reference")
+	replaceFlag := set.StringLong("replace", 't', "", "and replace with another reference")
 
 	cloneOpt := set.StringLong("clone", 'c', "", "clone using a prefix")
-
-
-
-	// cloneFlag := getopt.BoolLong("clone", 'c', "clone hierarchy, prefix")
 
 	// no errors, just fail:
 	set.SetUsage(func() {
